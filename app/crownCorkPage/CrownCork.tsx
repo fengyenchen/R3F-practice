@@ -10,7 +10,7 @@ import * as THREE from 'three';
 // 將模型獨立成子元件
 function Model() {
   const gltf = useLoader(GLTFLoader, '/crownCork.glb');
-  
+
   const modelRef = useRef<any>(null);
   // 每一幀自動計算位置，達成上下左右漂浮
   useFrame((state) => {
@@ -22,6 +22,22 @@ function Model() {
     modelRef.current.position.y = Math.sin(elapsedTime * 1.0) * 0.04;
     // 左右漂浮 (x 軸)
     modelRef.current.position.x = Math.cos(elapsedTime * 0.8) * 0.02;
+
+    // 滑鼠互動
+    const targetRotationZ = (state.pointer.x) * 0.175;
+    const targetRotationX = (state.pointer.y) * 0.15;
+
+    modelRef.current.rotation.x = THREE.MathUtils.lerp(
+      modelRef.current.rotation.x,
+      targetRotationX,
+      0.05
+    );
+
+    modelRef.current.rotation.z = THREE.MathUtils.lerp(
+      modelRef.current.rotation.z,
+      targetRotationZ,
+      0.05
+    );
   })
 
   return <primitive ref={modelRef} object={gltf.scene} />;
@@ -65,7 +81,7 @@ export default function CrownCork() {
   }, []);
 
   return (
-    <div className="absolute inset-0 w-full h-full z-0 bg-[#151220] pointer-events-none">
+    <div className="absolute inset-0 w-full h-full z-0">
       <Canvas
         style={{ width: '100vw', height: '100vh' }}
 
@@ -75,6 +91,7 @@ export default function CrownCork() {
           fov: isMobile ? 65 : 45,
         }}
         gl={{
+          alpha: true,
           antialias: true
         }}
       >
@@ -106,16 +123,6 @@ export default function CrownCork() {
           autoRotate={true} // 自動旋轉
           autoRotateSpeed={0.05} // 自動旋轉速度
 
-          mouseButtons={{
-            LEFT: 0,
-            MIDDLE: 0,
-            RIGHT: 0,
-          }}
-          touches={{
-            ONE: 0,
-            TWO: 0,
-          }}
-
           // 目的地/焦點位置
           target={[0, 0, 0]} // 相機旋轉與縮放的中心點
         />
@@ -123,7 +130,13 @@ export default function CrownCork() {
         {/* 後製效果 */}
         <EffectComposer>
           {/* 亮度閾值、亮度平滑度、效果高度 */}
-          <Bloom luminanceThreshold={0.2} luminanceSmoothing={0.9} height={300} />
+          <Bloom
+            intensity={1.5}
+            luminanceThreshold={0.1}
+            luminanceSmoothing={0.9}
+            mipmapBlur
+            levels={6}
+          />
         </EffectComposer>
 
       </Canvas>

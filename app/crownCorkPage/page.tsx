@@ -6,7 +6,7 @@ import Menu from "./Menu";
 
 export default function CrownCorkPage() {
   return (
-    <main className="relative w-full h-screen overflow-hidden bg-background flex flex-col items-center justify-between">
+    <main className="relative w-full h-screen overflow-hidden bg-[#151220] flex flex-col items-center justify-between">
 
       <CrownCork />
 
