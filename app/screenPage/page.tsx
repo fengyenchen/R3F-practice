@@ -17,6 +17,9 @@ export default function ScreenPage() {
     { id: 5, src: "/screen_photo5.png" },
     { id: 6, src: "/screen_photo6.png" },
     { id: 7, src: "/screen_photo7.png" },
+    { id: 8, src: "/screen_photo8.png" },
+    { id: 9, src: "/screen_photo9.png" },
+    { id: 10, src: "/screen_photo10.png" },
   ];
 
   const colors = ["green", "blue", "orange", "purple"];
