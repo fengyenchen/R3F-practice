@@ -1,13 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, use } from "react";
 import Screen from "./Screen";
+import Support from "./Support";
 
 export default function ScreenPage() {
   const [openImage, setOpenImage] = useState<string | null>(null);
 
   const [color, setColor] = useState<string>("green");
   const [alpha, setAlpha] = useState<string>("mid");
+  const [model, setModel] = useState<string>("screen");
+  const [autoRotate, setAutoRotate] = useState<boolean>(false);
+
+  const [isPanelOpen, setIsPanelOpen] = useState<boolean>(true);
 
   const images = [
     { id: 1, src: "/screen_photo1.png" },
@@ -23,13 +28,33 @@ export default function ScreenPage() {
   ];
 
   const colors = ["green", "blue", "orange", "purple"];
-
   const allAlpha = ["low", "mid", "high"];
+  const models = ["screen", "support"];
+
+  const [isMobile, setIsMobile] = useState(false);
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+
+      if (isMobile) {
+        setIsPanelOpen(true);
+      }
+    };
+
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
 
   return (
     <main className="relative w-full h-screen overflow-hidden bg-[#808080] flex items-center justify-center">
       {/* 3D */}
-      <Screen color={color} alpha={alpha} />
+      {model === "screen" && (
+        <Screen color={color} alpha={alpha} autoRotate={autoRotate} />
+      )}
+      {model === "support" && (
+        <Support autoRotate={autoRotate} />
+      )}
 
       {/* 圖片側邊欄 */}
       <div className="absolute bottom-8 md:top-8 left-8 z-10 flex flex-row md:flex-col gap-4 bg-white/10 p-4 
@@ -53,48 +78,98 @@ export default function ScreenPage() {
 
       {/* 模型組合切換 */}
       <div className="absolute top-8 left-8 md:left-auto md:right-8 z-10 flex flex-col gap-4 bg-white/10 p-4 rounded-xl border border-white/20 shadow-lg backdrop-blur-md text-white text-sm max-w-[calc(100vw-4rem)] md:w-50">
-        
-        {/* 顏色選擇 */}
-        <div className="w-full flex flex-row md:flex-col gap-4 md:gap-0">
-          <p className="font-semibold mb-2 opacity-80">Color</p>
-          <div className="flex flex-row gap-2 overflow-x-auto md:overflow-x-visible flex-nowrap md:flex-wrap scrollbar-none [&::-webkit-scrollbar]:hidden">
-            {colors.map((c) => (
-              <button
-                key={c}
-                onClick={() => setColor(c)}
-                className={`px-3 py-1.5 rounded-md border capitalize transition text-xs shrink-0 cursor-pointer ${
-                  color === c
-                    ? "bg-white text-neutral-800 font-medium border-white"
-                    : "bg-black/20 border-white/30 hover:border-white"
-                }`}
-              >
-                {c}
-              </button>
-            ))}
-          </div>
-        </div>
+        {isPanelOpen && (
+          <>
+            {/* 顏色選擇 */}
+            <div className="w-full flex flex-row md:flex-col gap-4 md:gap-0">
+              <p className="font-semibold mb-2 opacity-80">Color</p>
+              <div className="flex flex-row gap-2 overflow-x-auto md:overflow-x-visible flex-nowrap md:flex-wrap scrollbar-none [&::-webkit-scrollbar]:hidden">
+                {colors.map((c) => (
+                  <button
+                    key={c}
+                    onClick={() => setColor(c)}
+                    className={`px-3 py-1.5 rounded-md border capitalize transition text-xs shrink-0 cursor-pointer ${color === c
+                      ? "bg-white text-neutral-800 font-medium border-white"
+                      : "bg-black/20 border-white/30 hover:border-white"
+                      }`}
+                  >
+                    {c}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-        {/* 透明度選擇 */}
-        <div className="w-full flex flex-row md:flex-col gap-4 md:gap-0">
-          <p className="font-semibold mb-2 opacity-80">Alpha</p>
-          <div className="flex flex-row gap-2 overflow-x-auto md:overflow-x-visible flex-nowrap md:flex-wrap scrollbar-none [&::-webkit-scrollbar]:hidden">
-            {allAlpha.map((a) => (
+            {/* 透明度選擇 */}
+            <div className="w-full flex flex-row md:flex-col gap-4 md:gap-0">
+              <p className="font-semibold mb-2 opacity-80">Alpha</p>
+              <div className="flex flex-row gap-2 overflow-x-auto md:overflow-x-visible flex-nowrap md:flex-wrap scrollbar-none [&::-webkit-scrollbar]:hidden">
+                {allAlpha.map((a) => (
+                  <button
+                    key={a}
+                    onClick={() => setAlpha(a)}
+                    className={`px-3 py-1.5 rounded-md border capitalize transition text-xs shrink-0 cursor-pointer ${alpha === a
+                      ? "bg-white text-neutral-800 font-medium border-white"
+                      : "bg-black/20 border-white/30 hover:border-white"
+                      }`}
+                  >
+                    {a}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 模型選擇 */}
+            <div className="w-full flex flex-row md:flex-col gap-4 md:gap-0">
+              <p className="font-semibold mb-2 opacity-80">Model</p>
+              <div className="flex flex-row gap-2 overflow-x-auto md:overflow-x-visible flex-nowrap md:flex-wrap scrollbar-none [&::-webkit-scrollbar]:hidden">
+                {models.map((m) => (
+                  <button
+                    key={m}
+                    onClick={() => setModel(m)}
+                    className={`px-3 py-1.5 rounded-md border capitalize transition text-xs shrink-0 cursor-pointer ${model === m
+                      ? "bg-white text-neutral-800 font-medium border-white"
+                      : "bg-black/20 border-white/30 hover:border-white"
+                      }`}
+                  >
+                    {m}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 額外選擇 */}
+            <div className="w-full flex flex-row md:flex-col gap-2 md:gap-0 border-t border-white/20 pt-4">
+
+              {/* 自動旋轉 */}
               <button
-                key={a}
-                onClick={() => setAlpha(a)}
-                className={`px-3 py-1.5 rounded-md border capitalize transition text-xs shrink-0 cursor-pointer ${
-                  alpha === a
-                    ? "bg-white text-neutral-800 font-medium border-white"
-                    : "bg-black/20 border-white/30 hover:border-white"
-                }`}
+                onClick={() => setAutoRotate(!autoRotate)}
+                className={`px-3 py-1.5 rounded-md border transition text-xs shrink-0 cursor-pointer ${autoRotate ?
+                  "bg-white text-neutral-800 font-medium border-white"
+                  : "bg-black/20 border-white/30 hover:border-white"
+                  }`}
               >
-                {a}
+                Auto Rotate
               </button>
-            ))}
-          </div>
-        </div>
+
+            </div>
+          </>
+        )}
+
+        {/* 折疊按紐 */}
+        {isMobile && (
+          <button
+            onClick={() => setIsPanelOpen(!isPanelOpen)}
+            className={`${isPanelOpen ? 'absolute bottom-4 right-4' : ''} w-8 h-8 p-2 rounded-full transition`}
+          >
+              <span className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 text-white/70 text-xl font-bold">
+                {isPanelOpen ? '−' : '+'}
+              </span>
+              
+          </button>
+        )}
 
       </div>
+
 
       {/* 圖片視窗 */}
       {openImage && (
@@ -120,6 +195,8 @@ export default function ScreenPage() {
           </div>
         </div>
       )}
+
+
     </main>
   );
 }

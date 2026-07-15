@@ -5,21 +5,10 @@ import { Canvas, useLoader } from '@react-three/fiber';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { OrbitControls, Environment } from '@react-three/drei';
 
-function Model({ color, alpha, autoRotate }: { color: string; alpha: string; autoRotate: boolean }) {
-  // 不變的骨架
-  const frame = useLoader(GLTFLoader, '/screen_frame.glb');
-  // 切換顏色
-  const colorModel = useLoader(GLTFLoader, `/screen_${color}.glb`);
-  // 切換透明度
-  const alphaModel = useLoader(GLTFLoader, `/screen_alpha_${alpha}.glb`);
+function Model() {
+  const gltf = useLoader(GLTFLoader, '/screen_support.glb');
 
-  return (
-    <>
-      <primitive object={frame.scene} />
-      <primitive object={colorModel.scene} />
-      <primitive object={alphaModel.scene} />
-    </>
-  );
+  return <primitive object={gltf.scene} scale={10} />;
 }
 
 // 燈光組件
@@ -41,8 +30,7 @@ function Lights() {
   );
 }
 
-// 接收父元件傳下來的狀態
-export default function Screen({ color, alpha, autoRotate }: { color: string; alpha: string; autoRotate: boolean }) {
+export default function Support( { autoRotate }: { autoRotate: boolean }) {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -59,7 +47,7 @@ export default function Screen({ color, alpha, autoRotate }: { color: string; al
     <div className="absolute inset-0 w-full h-full z-0">
       <Canvas
         camera={{
-          position: isMobile ? [-3, 4, -12] : [-4, 6, -6],
+          position: isMobile ? [-3, 4, -10] : [-4, 6, -6],
           fov: isMobile ? 55 : 45,
         }}
         gl={{
@@ -69,9 +57,9 @@ export default function Screen({ color, alpha, autoRotate }: { color: string; al
       >
         <Lights />
 
-        {/* 當狀態改變時，Suspense 會在載入新模型時自動處理 */}
+        {/* 將 Suspense 包裹剛剛建立的 Model 元件 */}
         <Suspense fallback={null}>
-          <Model color={color} alpha={alpha} autoRotate={autoRotate} />
+          <Model  />
         </Suspense>
 
         <OrbitControls
@@ -87,7 +75,7 @@ export default function Screen({ color, alpha, autoRotate }: { color: string; al
           autoRotateSpeed={5} // 自動旋轉速度
 
           // 目的地/焦點位置
-          target={[0, 2.5, 0]} // 相機旋轉與縮放的中心點
+          target={[0, 0, 0]} // 相機旋轉與縮放的中心點
         />
       </Canvas>
     </div>
